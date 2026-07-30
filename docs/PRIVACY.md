@@ -1,6 +1,6 @@
 # Privacy model
 
-Markdown Task Manager is designed for private data, but privacy depends on how
+Research Workbench is designed for private data, but privacy depends on how
 you deploy and store the vault.
 
 ## Boundaries
@@ -12,13 +12,14 @@ you deploy and store the vault.
 - Common private, import, database, dependency, and build directories are
   excluded from indexing.
 - Non-local API requests require `PM_APP_TOKEN`.
-- The health endpoint reports availability, not paths or file contents.
+- The unauthenticated health endpoint reports availability, not paths or file
+  contents.
 - The browser stores the app token locally and sends it only to the configured
   origin.
 
 ## What the app does not provide
 
-- `private: true` is not encryption.
+- `private: true` is a display filter, not encryption or access control.
 - The bearer token is not multi-user authentication.
 - The app does not encrypt the vault at rest.
 - The app cannot prevent a vault repository from being made public.
@@ -30,7 +31,8 @@ you deploy and store the vault.
 1. Keep the public application checkout separate from the vault.
 2. Store the vault on an encrypted device or private persistent disk.
 3. Use a long random `PM_APP_TOKEN`.
-4. Put remote access behind TLS and, preferably, an identity-aware proxy.
+4. Put remote access behind TLS and an access-controlled network boundary,
+   preferably an identity-aware proxy.
 5. Use a separate private GitHub repository if synchronization is enabled.
 6. Grant a GitHub token access only to that vault repository.
 7. Never commit `.env`, private keys, exports, or browser data.

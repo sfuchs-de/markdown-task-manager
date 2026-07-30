@@ -1,142 +1,137 @@
-# Markdown Task Manager
+# Research Workbench
 
-A private-by-default task and project workbench built on ordinary Markdown
-files.
+Research Workbench is a configurable, Markdown-first project manager for
+research. This repository is named `markdown-task-manager` for continuity; the
+application and interface are called **Research Workbench**.
 
-The application gives you a searchable dashboard, project and task views,
-Markdown editing and preview, wiki links, lightweight metadata controls,
-calendar-oriented filtering, and optional synchronization to a **separate
-private GitHub vault**. Your files remain readable in any editor and are never
-locked into a database.
+Projects, tasks, notes, dates, plans, and module records stay as ordinary
+Markdown with YAML frontmatter. The application adds a searchable dashboard,
+editing, planning, visual summaries, and optional synchronization without
+turning the vault into a proprietary database.
 
-## What is public—and what is not
-
-This repository contains only application code, documentation, and a fictional
-example vault. It contains no user vault, credentials, messages, calendar
-events, health records, travel plans, collaborator records, or private Git
-history.
-
-When you use the app, keep your real vault outside this repository or under the
-ignored `vault/` directory. If you synchronize it with GitHub, create a separate
-**private** repository for the vault.
+![Research Workbench overview built from the fictional starter vault](docs/images/overview.png)
 
 ## Features
 
-- Markdown and YAML frontmatter remain canonical.
-- Overview counts for projects, open tasks, waiting work, and notes.
-- Searchable Tasks, Projects, Calendar, and full Library views.
-- Read and edit modes with conflict-aware, atomic saves.
-- Quick task-status changes and lifecycle moves.
-- `[[wiki links]]`, `[[document-id|labels]]`, aliases, and backlinks.
-- Responsive light and dark interfaces.
-- Token-protected remote access.
-- Optional, explicit GitHub push and restore workflow.
-- Privacy and credential scans in CI.
+- Tasks, projects, notes, calendar, boards, graph, and time planning
+- Admin, travel, collaborator/RA, wellness, performance-review, and scholar
+  metrics modules
+- Markdown editing, KaTeX math, wiki links, aliases, and backlinks
+- Vault-local application name, owner aliases, module labels, and domain rules
+- Deterministic static views under `<vault>/.generated`
+- Optional GitHub synchronization, disabled by default and dry-run-first
+- Local Python/Node operation and Docker-based private self-hosting
 
-## Try it in five minutes
+All examples are synthetic. No personal vault, private Git history, generated
+dashboard, correspondence, calendar, health record, travel plan, collaborator
+record, or binary document belongs in this repository.
 
-Requirements: Python 3.11+, Node.js 22+, and npm.
+## Five-minute start
+
+Requirements: Python 3.11+, Node.js 22+, npm, and Git.
 
 ```bash
-git clone https://github.com/<owner>/markdown-task-manager.git
+git clone https://github.com/sfuchs-de/markdown-task-manager.git
 cd markdown-task-manager
 make setup
-make demo
+make init
 ```
 
-Start the API in one terminal:
+Run the API and web application in separate terminals:
 
 ```bash
 make api
-```
-
-Start the web application in a second terminal:
-
-```bash
 make web
 ```
 
-Open [http://127.0.0.1:5173](http://127.0.0.1:5173). Localhost access does not
-require a token by default.
-
-To use an existing vault instead:
+Open [http://127.0.0.1:5173](http://127.0.0.1:5173). To use an existing vault:
 
 ```bash
-PM_VAULT_ROOT="/absolute/path/to/your/vault" make api
+PM_VAULT_ROOT="/absolute/path/to/vault" make api
 ```
 
-The app never modifies a file until you explicitly save or change task
-metadata.
+Useful checks:
 
-## Markdown format
+```bash
+make doctor
+make qa
+make test-e2e
+```
 
-A task is a Markdown file with a small YAML header:
+`python scripts/pm.py init --vault <path>` refuses to overwrite a nonempty
+directory. `PM_OUTPUT_ROOT` defaults to `<vault>/.generated`.
+
+## Configuration
+
+The starter vault includes `settings/workbench.yml`. It controls the
+application name, owner aliases, enabled modules, custom module labels, domain
+labels, metadata-based classification rules, and an optional scholar-statistics
+source.
+
+Frontmatter is the primary classifier:
 
 ```markdown
 ---
 kind: task
-id: revise-introduction
-title: Revise the introduction
+id: estimate-baseline
+title: Estimate the baseline
 status: active
+domain: research
+area: modeling
+project: harbor-flows
 priority: 1
-project: paper-example
 due: 2026-09-30
-assignee: Example User
+deadline_type: soft
+assignee: Owner
 ---
-# Revise the introduction
-
-## Next action
-
-- Incorporate the argument from [[identification-note]].
 ```
 
-Projects live at `projects/<project-id>/README.md`; tasks commonly live under
-`tasks/active`, `tasks/waiting`, and `tasks/done`. The parser also accepts less
-structured Markdown, so you can adopt the conventions incrementally.
-
-See [Vault format](docs/VAULT_FORMAT.md) for the complete recommended layout.
+Unmatched entries are assigned to `other`; project names are not hidden
+classification rules. See [Vault format](docs/VAULT_FORMAT.md),
+[Configuration](docs/CONFIGURATION.md), and [Modules](docs/MODULES.md).
 
 ## Docker
 
-Copy the example vault or add your own files under `vault/`, choose a strong
-token, and start the container:
-
 ```bash
-cp -R example-vault/. vault/
-export PM_APP_TOKEN="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
+make init
 docker compose up --build
 ```
 
-Open [http://127.0.0.1:8765](http://127.0.0.1:8765). The vault is mounted into
-the container and is not built into the image.
+Compose binds only to `127.0.0.1:8765`, mounts the writable vault at `/vault`,
+and runs the container as a non-root user. For access from another machine,
+set a strong `PM_APP_TOKEN`, use TLS, and put the service behind an
+access-controlled network boundary. There is no public hosted demo.
 
-## Remote access
+See [Docker and private hosting](docs/DOCKER.md).
 
-Do not expose the server directly without `PM_APP_TOKEN` and TLS. The API
-requires a bearer token for non-local requests and deliberately returns no
-credentials or vault contents from its health endpoint.
+## Privacy boundary
 
-For deployment, backup, and optional GitHub synchronization, read
-[Self-hosting](docs/SELF_HOSTING.md) and [Privacy model](docs/PRIVACY.md).
+`private: true` is a display filter, **not encryption or access control**.
+The bearer token is not a multi-user identity system. Keep the vault on
+encrypted storage, use an access-controlled network for remote instances, and
+review any static export before sharing it.
 
-## Development
+GitHub synchronization is off unless explicitly enabled. If used, point it at
+a separate private vault repository. Read [Privacy and security](docs/PRIVACY.md)
+and [GitHub synchronization](docs/GITHUB_SYNC.md) first.
 
-```bash
-make test
-make build
-make privacy
-```
+## Documentation
 
-Pull requests run Python tests, TypeScript checks, frontend tests, a production
-build, the privacy scan, and a container build.
+- [CLI](docs/CLI.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Backup and restore](docs/BACKUP_RESTORE.md)
+- [Upgrading](docs/UPGRADING.md)
+- [Contributing](CONTRIBUTING.md) and [security policy](SECURITY.md)
 
-## Scope
+## Status and support
 
-This public edition focuses on the reusable core: projects, tasks, notes,
-calendar metadata, Markdown editing, links, and private synchronization.
-Personalized modules and any user-specific data from the original private
-installation are intentionally not distributed.
+Version `1.x` is self-hosted software. Interfaces may change between minor
+releases; tagged releases and the changelog document migrations. This is
+a community-supported project with no uptime or response-time guarantee.
+Use GitHub Issues for reproducible bugs and feature proposals. Do not include
+private vault excerpts, credentials, screenshots of real data, or sensitive
+paths in an issue.
 
 ## License
 
-[MIT](LICENSE). Use it, adapt it, and keep your own vault private.
+[MIT](LICENSE).

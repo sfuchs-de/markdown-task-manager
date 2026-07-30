@@ -20,14 +20,26 @@ try:
 except Exception as exc:  # pragma: no cover
     raise SystemExit("PyYAML is required. Install with: python3 -m pip install pyyaml") from exc
 
-ROOT = Path(__file__).resolve().parents[1] / "vault"
+try:
+    from scripts.workbench_paths import VAULT_ROOT
+except ImportError:  # pragma: no cover
+    from workbench_paths import VAULT_ROOT
+
+ROOT = VAULT_ROOT
 
 # NOTE: CORE_FIELDS is deliberately NOT shared. The two consumers diverge for a
 # real reason: server/vault.py promotes assignee/assigned_to/domain to top-level
 # entry fields, while markdown_reader.py surfaces them via `properties`. Unifying
 # the set would drop assignee from the reader's cache (it has no top-level slot
 # for it), which RA rendering depends on. Each consumer keeps its own CORE_FIELDS.
-STRUCTURED_PROPERTY_FIELDS = {"ledger"}
+STRUCTURED_PROPERTY_FIELDS = {
+    "bullets",
+    "criteria",
+    "evidence",
+    "fitness_plan",
+    "ledger",
+    "source_pointers",
+}
 
 WIKILINK_RE = re.compile(r"\[\[([^\]|#]+)(?:[#|][^\]]*)?\]\]")
 H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)

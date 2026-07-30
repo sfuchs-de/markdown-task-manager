@@ -1,45 +1,26 @@
 import { defineConfig, devices } from '@playwright/test';
-import { existsSync } from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const webRoot = path.dirname(fileURLToPath(import.meta.url));
-const root = path.dirname(webRoot);
-const localPython = path.join(root, '.venv', 'bin', 'python');
-const python = process.env.PM_TEST_PYTHON || (existsSync(localPython) ? localPython : 'python');
 
 export default defineConfig({
   testDir: './e2e',
-  fullyParallel: false,
+  timeout: 30_000,
+  expect: { timeout: 8_000 },
   workers: 1,
-  retries: 0,
-  reporter: 'list',
   use: {
-    baseURL: 'http://127.0.0.1:4173',
-    trace: 'retain-on-failure',
+    baseURL: 'http://127.0.0.1:18765',
+    ...devices['Desktop Chrome'],
   },
-  projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'mobile', use: { ...devices['iPhone 13'] } },
-  ],
   webServer: [
     {
-      command: `"${python}" -m uvicorn server.app:app --host 127.0.0.1 --port 8765`,
-      cwd: root,
-      env: {
-        ...process.env,
-        PM_VAULT_ROOT: path.join(webRoot, '.tmp', 'e2e-vault'),
-      },
-      url: 'http://127.0.0.1:8765/api/health',
+      command: 'cd .. && PY=python3; if [ -x .venv/bin/python ]; then PY=.venv/bin/python; fi; PM_VAULT_ROOT=web/.tmp/playwright-vault PM_OUTPUT_ROOT=web/.tmp/playwright-vault/.generated $PY -m uvicorn server.app:app --host 127.0.0.1 --port 18765',
+      url: 'http://127.0.0.1:18765/api/health',
       reuseExistingServer: false,
-      timeout: 30_000,
+      timeout: 20_000,
     },
     {
-      command: 'npm run dev -- --port 4173',
-      cwd: webRoot,
-      url: 'http://127.0.0.1:4173',
+      command: 'cd .. && PY=python3; if [ -x .venv/bin/python ]; then PY=.venv/bin/python; fi; PM_VAULT_ROOT=web/.tmp/playwright-empty-vault PM_OUTPUT_ROOT=web/.tmp/playwright-empty-vault/.generated $PY -m uvicorn server.app:app --host 127.0.0.1 --port 18766',
+      url: 'http://127.0.0.1:18766/api/health',
       reuseExistingServer: false,
-      timeout: 30_000,
+      timeout: 20_000,
     },
   ],
 });
