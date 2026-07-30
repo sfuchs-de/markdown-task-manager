@@ -1,0 +1,27 @@
+.DS_Store
+.env
+.venv/
+__pycache__/
+*.py[cod]
+*.tsbuildinfo
+.pytest_cache/
+web/node_modules/
+web/dist/
+web/.tmp/
+web/test-results/
+web/playwright-report/
+web/vite.config.js
+web/vite.config.d.ts
+web/vitest.config.js
+web/vitest.config.d.ts
+
+# User vaults are intentionally outside the public source history.
+vault/*
+!vault/.gitkeep
+
+# Local exports and credentials.
+.secrets/
+.backups/
+exports/
+*.sqlite
+*.db

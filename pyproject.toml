@@ -1,0 +1,23 @@
+[project]
+name = "markdown-task-manager"
+version = "1.0.0"
+description = "A private-by-default Markdown project and task workbench"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+dependencies = [
+  "PyYAML>=6.0,<7",
+  "fastapi>=0.115,<1",
+  "uvicorn[standard]>=0.32,<1",
+]
+
+[dependency-groups]
+dev = [
+  "httpx>=0.27,<1",
+  "httpx2>=2.0,<3",
+  "pytest>=9.0.3,<10",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

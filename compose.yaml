@@ -1,0 +1,15 @@
+services:
+  task-manager:
+    build: .
+    ports:
+      - "8765:8765"
+    environment:
+      PM_APP_TOKEN: "${PM_APP_TOKEN:-change-me-before-network-use}"
+      PM_VAULT_ROOT: /vault
+    volumes:
+      - ./vault:/vault
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
