@@ -1,11 +1,12 @@
 services:
-  task-manager:
+  workbench:
     build: .
     ports:
-      - "8765:8765"
+      - "127.0.0.1:8765:8765"
     environment:
-      PM_APP_TOKEN: "${PM_APP_TOKEN:-change-me-before-network-use}"
+      PM_APP_TOKEN: "${PM_APP_TOKEN:-}"
       PM_VAULT_ROOT: /vault
+      PM_OUTPUT_ROOT: /vault/.generated
     volumes:
       - ./vault:/vault
     read_only: true

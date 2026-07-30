@@ -17,10 +17,6 @@ from typing import Any, Iterator
 
 
 SYNC_ROOT_FILES = {
-    "AGENTS.md",
-    "CLAUDE.md",
-    "GEMINI.md",
-    "OPENCLAW.md",
     "README.md",
     "START_HERE.md",
 }
@@ -31,7 +27,6 @@ SYNC_DIRS = {
     "_inbox",
     "archive",
     "areas",
-    "config",
     "dates",
     "docs",
     "journal",
@@ -57,7 +52,7 @@ SYNC_EXCLUDED_PARTS = {
     "imports",
     "local_data",
     "large_data",
-    ".secrets",
+    "vault",
 }
 
 SYNC_EXCLUDED_SUFFIXES = {".sqlite", ".db", ".dta", ".parquet", ".feather", ".rds", ".pyc"}
@@ -88,9 +83,9 @@ class GitHubSyncConfig:
             repo=repo,
             branch=os.environ.get("PM_GITHUB_BRANCH", "main").strip() or "main",
             token=os.environ.get("PM_GITHUB_TOKEN", "").strip(),
-            author_name=os.environ.get("PM_GITHUB_AUTHOR_NAME", "Render Task Manager").strip() or "Render Task Manager",
-            author_email=os.environ.get("PM_GITHUB_AUTHOR_EMAIL", "render-task-manager@example.invalid").strip()
-            or "render-task-manager@example.invalid",
+            author_name=os.environ.get("PM_GITHUB_AUTHOR_NAME", "Research Workbench Automation").strip() or "Research Workbench Automation",
+            author_email=os.environ.get("PM_GITHUB_AUTHOR_EMAIL", "workbench-automation@example.invalid").strip()
+            or "workbench-automation@example.invalid",
             remote_url_override=os.environ.get("PM_GITHUB_REMOTE_URL", "").strip(),
             sparse_dirs=sparse_dirs,
         )
@@ -259,6 +254,7 @@ class GitHubSyncService:
         remote_head = ""
         payload.update(
             {
+                "vault_root": str(self.root),
                 "git_available": self.git_available(),
                 "vault_file_count": len(sync_files(self.root)),
                 "remote_head": remote_head,
@@ -336,7 +332,7 @@ class GitHubSyncService:
             headers={
                 "Accept": "application/vnd.github+json",
                 "Authorization": f"Bearer {self.config.token}",
-                "User-Agent": "task-manager-github-sync",
+                "User-Agent": "research-workbench-github-sync",
                 "X-GitHub-Api-Version": "2022-11-28",
             },
         )

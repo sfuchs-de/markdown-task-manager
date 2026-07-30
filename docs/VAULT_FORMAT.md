@@ -19,6 +19,8 @@ vault/
 │   └── done/
 ├── dates/
 ├── notes/
+├── settings/
+│   └── workbench.yml
 ├── sources/
 └── templates/
 ```
@@ -35,10 +37,13 @@ private/import folders, databases, and generated build folders are excluded.
 | `title` | Display title; an H1 is the fallback |
 | `status` | Workflow state |
 | `project` | Owning project ID |
+| `domain` | Primary top-level classifier; unmatched entries become `other` |
+| `area` | Optional module or work-area label |
+| `module` | Optional dedicated module, such as `travel` or `wellness` |
 | `priority` | Lower numbers sort first |
 | `due` / `date` | ISO date, `YYYY-MM-DD` |
 | `assignee` | Optional person or team label |
-| `private` | Display hint; not encryption |
+| `private` | Display filter; not encryption or access control |
 | `aliases` | Alternative stable link targets |
 
 Task states recognized by the quick editor are `open`, `active`, `waiting`,

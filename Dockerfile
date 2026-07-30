@@ -8,12 +8,15 @@ RUN npm --prefix web run build
 FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PM_VAULT_ROOT=/vault
+    PM_VAULT_ROOT=/vault \
+    PM_OUTPUT_ROOT=/vault/.generated
 WORKDIR /app
 COPY requirements.txt .
 RUN python -m pip install --no-cache-dir -r requirements.txt
 COPY server ./server
 COPY scripts ./scripts
+COPY templates ./templates
+COPY example-vault ./example-vault
 COPY --from=web /app/web/dist ./web/dist
 RUN mkdir -p /vault && useradd --create-home --uid 10001 app && chown -R app:app /app /vault
 USER app

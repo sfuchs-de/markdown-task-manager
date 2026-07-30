@@ -16,16 +16,27 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.11"
           cache: pip
       - run: python -m pip install -r requirements-dev.txt
       - run: python -m pytest
-      - run: python scripts/privacy_scan.py
+      - name: Validate a pinned synthetic vault
+        run: |
+          vault="$(mktemp -d)"
+          python scripts/pm.py init --vault "$vault" --today 2026-07-30
+          PM_VAULT_ROOT="$vault" PM_OUTPUT_ROOT="$vault/.generated" python scripts/pm.py doctor
+          python scripts/validate_vault_schema.py --root "$vault"
+          PM_VAULT_ROOT="$vault" PM_OUTPUT_ROOT="$vault/.generated" python scripts/sync_markdown.py
+          PM_VAULT_ROOT="$vault" PM_OUTPUT_ROOT="$vault/.generated" PM_RENDER_TIMESTAMP=2026-07-30T12:00:00Z python scripts/render_static.py
+      - run: python scripts/check_links.py
+      - run: python scripts/privacy_scan.py --all-files --history
       - run: python -m pip install pip-audit && python -m pip_audit -r requirements-dev.txt
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: npm
@@ -34,11 +45,13 @@ jobs:
       - run: npm --prefix web audit --audit-level=moderate
       - run: npm --prefix web test
       - run: npm --prefix web run build
-      - run: npm --prefix web exec -- playwright install --with-deps chromium webkit
+      - run: cd web && npx playwright install --with-deps chromium
       - run: npm --prefix web run test:e2e
+      - run: git diff --check
 
   container:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - run: docker build --tag markdown-task-manager:test .
+      - uses: actions/checkout@v6
+      - run: docker build --tag research-workbench:test .
+      - run: python scripts/docker_smoke.py --image research-workbench:test

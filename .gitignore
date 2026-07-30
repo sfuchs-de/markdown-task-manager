@@ -14,6 +14,9 @@ web/vite.config.js
 web/vite.config.d.ts
 web/vitest.config.js
 web/vitest.config.d.ts
+.generated/
+data/
+dashboard/
 
 # User vaults are intentionally outside the public source history.
 vault/*
@@ -22,6 +25,19 @@ vault/*
 # Local exports and credentials.
 .secrets/
 .backups/
+private/
+attachments/
 exports/
 *.sqlite
 *.db
+*.pdf
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+*.dta
+*.parquet
+*.feather
+*.rds

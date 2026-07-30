@@ -1,0 +1,43 @@
+application:
+  name: Research Workbench
+  owner_label: Owner
+  owner_aliases: [Owner, me, self]
+
+modules:
+  overview: {enabled: true, label: Overview}
+  tasks: {enabled: true, label: Tasks}
+  projects: {enabled: true, label: Projects}
+  notes: {enabled: true, label: Library}
+  calendar: {enabled: true, label: Calendar}
+  boards: {enabled: true, label: Boards}
+  graph: {enabled: true, label: Graph}
+  time_planning: {enabled: true, label: Time Plan}
+  admin: {enabled: true, label: Admin Center}
+  travel: {enabled: true, label: Travel Center}
+  collaborators: {enabled: true, label: Collaborators}
+  wellness: {enabled: true, label: Wellness}
+  performance: {enabled: true, label: Performance Review}
+  scholar_metrics: {enabled: true, label: Scholar Metrics}
+  github_sync: {enabled: false, label: GitHub Sync}
+  markdown_editor: {enabled: true, label: Editor}
+  codex_backlog: {enabled: true, label: Agent Backlog}
+
+domains:
+  labels:
+    research: Research
+    admin: Administration
+    teaching: Teaching
+    personal: Personal
+    system: System
+    archive: Archive
+    other: Other
+  classification_rules:
+    - {domain: research, field: domain, values: [research]}
+    - {domain: admin, field: domain, values: [admin]}
+    - {domain: teaching, field: domain, values: [teaching]}
+    - {domain: personal, field: domain, values: [personal, wellness]}
+    - {domain: system, field: domain, values: [system]}
+    - {domain: archive, field: domain, values: [archive]}
+
+profile:
+  scholar_statistics_source: settings/scholar-stats.json

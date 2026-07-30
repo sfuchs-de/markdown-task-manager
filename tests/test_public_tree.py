@@ -24,5 +24,6 @@ def test_example_vault_contains_only_fictional_identity_labels() -> None:
         path.read_text(encoding="utf-8")
         for path in (ROOT / "example-vault").rglob("*.md")
     )
-    assert "Example User" in text
-    assert "Example Collaborator" in text
+    assert "Avery Example" in text
+    assert "Fictional Research Studio" not in text
+    assert "All amounts and coverage rules are invented." in text

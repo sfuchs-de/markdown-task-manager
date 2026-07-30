@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import re
+import shutil
 import subprocess
 import tempfile
 import time
@@ -15,6 +16,8 @@ from typing import Any, ClassVar
 
 import yaml
 
+from scripts.workbench_config import apply_domain_classification, load_workbench_config
+from scripts.workbench_paths import VAULT_ROOT
 from scripts.vault_parsing import (  # shared frontmatter/body primitives
     CODEX_INSTRUCTION_ITEM_RE,
     CODEX_INSTRUCTIONS_HEADING_RE,
@@ -33,8 +36,7 @@ from scripts.vault_parsing import (  # shared frontmatter/body primitives
 )
 
 
-APP_ROOT = Path(__file__).resolve().parents[1]
-ROOT = Path(os.environ.get("PM_VAULT_ROOT", APP_ROOT / "vault")).expanduser().resolve()
+ROOT = VAULT_ROOT
 
 # Server-specific: parse_file promotes assignee/assigned_to/domain to top-level
 # entry fields, so they are core here. See scripts/vault_parsing.py for why this
@@ -105,6 +107,8 @@ EXCLUDED_PREFIXES = {
     "exports/private",
     "areas/health/private",
     "areas/health/imports",
+    "areas/wellness/private",
+    "areas/wellness/imports",
     "web/node_modules",
     "web/dist",
     "web/.tmp",
@@ -630,6 +634,7 @@ class VaultService:
 
         entries = entries_response_copy(list(parsed_entries.values()))
         entries.sort(key=lambda e: (e.get("modified_at") or 0), reverse=True)
+        apply_domain_classification(entries, load_workbench_config(self.root))
         backlink_started = time.perf_counter()
         linked_entries = self.add_backlinks(entries)
         backlink_ms = round((time.perf_counter() - backlink_started) * 1000, 2)
@@ -680,6 +685,7 @@ class VaultService:
                     }
                 )
         entries.sort(key=lambda e: (e.get("modified_at") or 0), reverse=True)
+        apply_domain_classification(entries, load_workbench_config(self.root))
         return self.add_backlinks(entries)
 
     def parse_file(self, path: Path) -> dict[str, Any]:
@@ -991,3 +997,8 @@ class VaultService:
             return {"enabled": True, "branch": None, "changed": [], "error": "Could not read git status"}
         changed = [{"status": line[:2].strip(), "path": line[3:]} for line in raw.splitlines() if line.strip()]
         return {"enabled": True, "branch": branch or None, "changed": changed}
+
+def copy_vault_fixture(src: Path, dst: Path) -> None:
+    if dst.exists():
+        shutil.rmtree(dst)
+    shutil.copytree(src, dst)

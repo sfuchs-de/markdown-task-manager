@@ -1,1 +1,1 @@
-"""Markdown Task Manager API package."""
+"""Research Workbench backend."""

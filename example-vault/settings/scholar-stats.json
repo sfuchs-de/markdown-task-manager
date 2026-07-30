@@ -1,0 +1,17 @@
+{
+  "name": "Example Researcher",
+  "affiliation": "Fictional Research Studio",
+  "metrics": {
+    "citations": {"all": 128, "recent": 94},
+    "h_index": {"all": 6, "recent": 5},
+    "i10_index": {"all": 4, "recent": 3}
+  },
+  "citations_by_year": [
+    {"year": 2024, "citations": 22},
+    {"year": 2025, "citations": 31},
+    {"year": 2026, "citations": 41}
+  ],
+  "top_publications": [
+    {"title": "A Fictional Study of Harbor Flows", "year": 2024, "citations": 37}
+  ]
+}

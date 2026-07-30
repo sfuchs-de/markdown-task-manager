@@ -1,4 +1,6 @@
-import type { VaultEntry, View } from './types';
+import type { VaultEntry } from './types';
+
+type View = 'overview' | 'tasks' | 'projects' | 'calendar' | 'all';
 
 export function entryKind(entry: VaultEntry): string {
   return String(entry.kind || entry.type || '').toLowerCase();
