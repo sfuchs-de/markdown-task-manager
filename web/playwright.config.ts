@@ -1,9 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const webRoot = path.dirname(fileURLToPath(import.meta.url));
 const root = path.dirname(webRoot);
+const localPython = path.join(root, '.venv', 'bin', 'python');
+const python = process.env.PM_TEST_PYTHON || (existsSync(localPython) ? localPython : 'python');
 
 export default defineConfig({
   testDir: './e2e',
@@ -21,7 +24,7 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: `"${path.join(root, '.venv', 'bin', 'python')}" -m uvicorn server.app:app --host 127.0.0.1 --port 8765`,
+      command: `"${python}" -m uvicorn server.app:app --host 127.0.0.1 --port 8765`,
       cwd: root,
       env: {
         ...process.env,
